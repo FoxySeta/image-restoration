@@ -69,7 +69,7 @@ def minimize(x0,b,f,df,mode,maxiter,abs_stop) -> np.ndarray: # funzione che impl
     function_eval_list[:,k]=f(x_last)
     error_list[:,k]=np.linalg.norm(x_last-b)
     norm_grad_list[:,k]=np.linalg.norm(df(x_last))
-    while (np.linalg.norm(df(x_last))>abs_stop and k < maxiter):
+    while (np.linalg.norm(df(x_last))>abs_stop and k < maxiter-1):
         k=k+1
         grad = df(x_last)#direction is given by gradient of the last iteration
         # backtracking step
@@ -82,9 +82,9 @@ def minimize(x0,b,f,df,mode,maxiter,abs_stop) -> np.ndarray: # funzione che impl
         x_last=x_last-step*grad
         if mode=='plot_history':
             x[:,k] = x_last
-            function_eval_list[:,k]=f(x_last)
-            error_list[:,k]=np.linalg.norm(x_last-b)
-            norm_grad_list[:,k]=np.linalg.norm(df(x_last))
+        function_eval_list[:,k]=f(x_last)
+        error_list[:,k]=np.linalg.norm(x_last-b)
+        norm_grad_list[:,k]=np.linalg.norm(df(x_last))
     function_eval_list = function_eval_list[:,:k+1]
     error_list = error_list[:,:k+1]
     norm_grad_list = norm_grad_list[:,:k+1]
@@ -123,7 +123,7 @@ def sci_minimize(x0, _, f, df):
 
 # files = ['1', '2', '3', '4', '5', '6', '7', '8', 'A', 'B']
 files = ['4']
-lambdas = [1,2,3]
+lambdas = [0.02,0.04,0.06]
 for file in files:
     blurred_images = phase1('img/' + file + '.png', False)
     deblurred = []
@@ -133,7 +133,7 @@ for file in files:
         tv_fns = f_generator(l, lib.totvar, lib.grad_totvar)
         for blurred in blurred_images:
             print(blurred[2].shape)
-            deblurred_image = phasen(blurred, tv_fns, sci_minimize)
+            deblurred_image = phasen(blurred, tv_fns, sci_minimize) #our_minimize)
             deblurred.append(deblurred_image)
 
     plt.figure(figsize=(21, 7))
@@ -148,5 +148,5 @@ for file in files:
         for j in range(len(blurred_images)):
             ax2 = plt.subplot(lines, len(blurred_images), lines+(i*len(blurred_images))+j)
             ax2.imshow(deblurred[i*len(blurred_images)+j], cmap='gray', vmin=0, vmax=1)
-            plt.title(f'immagine ripristinata con lambda={lambdas[j]}')
+            plt.title(f'immagine ripristinata con lambda={lambdas[i]}')
     plt.show()
