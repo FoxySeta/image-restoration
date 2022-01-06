@@ -11,17 +11,17 @@ MAXITER = 10
 
 # Methods Dictionary
 methods = {
-    "naive" : { 
-        "phi" : lambda _: 0,
-        "dphi" : lambda _: 0
+    'naive' : { 
+        'phi' : lambda _: 0,
+        'dphi' : lambda _: 0
     },
-    "tikhonov" : { 
-        "phi" : lambda X: 0.5*np.linalg.norm(X)**2,
-        "dphi" : lambda X: X
+    'tikhonov' : { 
+        'phi' : lambda X: 0.5*np.linalg.norm(X)**2,
+        'dphi' : lambda X: X
     },
-    "tv" : { 
-        "phi" : lib.totvar,
-        "dphi" : lib.grad_totvar
+    'tv' : { 
+        'phi' : lib.totvar,
+        'dphi' : lib.grad_totvar
     }
 }
 
@@ -30,23 +30,21 @@ blurs = ((5, 0.5), (7, 1), (9, 1.3))
 
 # Function that implement gradient method
 def minimize(x0,f,df,maxiter,abs_stop) -> np.ndarray: 
-
     #initialize first values
     x_last = np.zeros((x0.size))
     k=0
 
     # Stopping criteria 
-    # k < maxiter -1 ( -1 because otherise returns out of bounds )
+    # k < maxiter -1 ( -1 to prevent out of bounds )
     while (np.linalg.norm(df(x_last))>abs_stop and k < maxiter-1):
         k=k+1
-        grad = df(x_last)#direction is given by gradient of the last iteration
+        grad = df(x_last) # The direction is given by the gradient of the last iteration
 
-        # backtracking step
+        # Backtracking step
         step = lib.next_step(x_last,f,grad)
 
         if(step==-1):
-            print('non convergente')
-            return (k) #no convergence
+            raise Exception('CG minimize not converging')
 
         # calculate new x with 'step' as alpha and '-grad' as the direction
         x_last=x_last-step*grad
@@ -54,11 +52,11 @@ def minimize(x0,f,df,maxiter,abs_stop) -> np.ndarray:
 
 # read image data from file
 def phase0(name):
-    path = "img/" + name + ".png"
+    path = 'img/' + name + '.png'
     img = plt.imread(path).astype(np.float64)
     return img
 
-# Apply blur and noise then return the new image, PSF, PSNR and MSE
+# Apply blur and noise then return (the new image, PSF, PSNR and MSE, K)
 def phase1(img):
     bs = []
     # Iterate for each blurs
@@ -84,7 +82,7 @@ def phasen(blurred, l, phi_dphi, minimize):
 
 def phasen_multi(lambdas, blurred_images, method='naive', minFun='scipy'):
     deblurred = []
-    phi_dphi = (methods[method]["phi"], methods[method]["dphi"])
+    phi_dphi = (methods[method]['phi'], methods[method]['dphi'])
     minimizeFun = sci_minimize if minFun == 'scipy' else our_minimize
     
     for l in lambdas:
@@ -92,15 +90,15 @@ def phasen_multi(lambdas, blurred_images, method='naive', minFun='scipy'):
             deblurred.append(phasen(blurred, l, phi_dphi, minimizeFun))
     return deblurred
 
-"""
+'''
     f_generator = f(l, regulating_term, regulating_term_grad) -> hardcode_f(K,b) -> (f,df)
 
-    Generalization of function to minimize and of its derivative
+    Generalization of the function to minimize and of its derivative
 
     l = lambda
-    regulating_factor = fn(X) -> matrix
-    regulating_factor_grad = fn(X) -> matrix
-"""
+    regulating_term = fn(X) -> matrix of shape X
+    regulating_term_grad = fn(X) -> matrix of shape X
+'''
 def f_generator(l, regulating_term, regulating_term_grad):
     def hardcode_f(K,b):
         def f(x):
@@ -117,15 +115,15 @@ def f_generator(l, regulating_term, regulating_term_grad):
         return (f,df)
     return hardcode_f
 
-"""
+'''
     our_minimize = (x0, f, df) -> matrix
-"""
+'''
 def our_minimize(x0, f, df):
     return np.reshape(minimize(x0, f, df,MAXITER,MAXITER*2), x0.shape)
 
-"""
+'''
     sci_minimize = (x0, f, df) -> matrix
-"""
+'''
 def sci_minimize(x0, f, df):
     return np.reshape(sciminimize(f, x0, method='CG', jac=df, options={'maxiter':MAXITER}).x, x0.shape)
 
@@ -146,16 +144,16 @@ def show_plt(file, method, lambdas, original, blurred_images, deblurred, figW=14
                 tx.imshow(blurred_images[col][0], cmap='gray', vmin=0, vmax=1)
             else:
                 coord = (row-2)*(len_b) + col
-                tx.set_title(f"Lambda={lambdas[row-2]}")
+                tx.set_title(f'Lambda={lambdas[row-2]}')
                 tx.imshow(deblurred[coord], cmap='gray', vmin=0, vmax=1)
 
     plt.show()
 
-if __name__ == "__main__":
-    print("Esempio di esecuzione:\npython main.py [naive|tikhonov|tv] [our|scipy] (MAXITER) ( ... lambdas )")
+if __name__ == '__main__':
+    print('Esempio di esecuzione:\npython main.py [naive|tikhonov|tv] [our|scipy] (MAXITER) ( ... lambdas )')
     args = sys.argv[1:]
     if(len(args) == 0 or args[0] not in methods):
-        print("Devi scegliere un methodo : naive | tikhonov | tv ")
+        print('Devi scegliere un methodo : naive | tikhonov | tv ')
         exit()
 
     method = args[0]
@@ -164,27 +162,26 @@ if __name__ == "__main__":
     if(len(args) > 1):
         minFun = args[1]
         if(minFun != 'scipy' and minFun != 'our'):
-            print("La funzione di minimizzazione deve essere 'our' o 'scipy' !")
+            print('La funzione di minimizzazione deve essere \'our\' o \'scipy\'!')
             exit()
 
     try:
         if(len(args) > 2):
             MAXITER = int(args[2])
     except:
-        print("MAXITER deve essere un numero intero!")
+        print('MAXITER deve essere un numero intero!')
         exit()
 
     # default lambdas
     lambdas = [1,2,3,4]
     try:
         if(len(args) > 3):
-            lambdas = np.array(args[3:]).astype(float)
+            lambdas = np.array(args[3:]).astype(np.float64)
     except:
-        print("Le λ devono essere numeri!")
+        print('Le λ devono essere numeri!')
         exit()
 
-    # files = ['1', '2', '3', '4', '5', '6', '7', '8', 'A', 'B']
-    files_os = os.listdir("img/")
+    # files = os.listdir('img/')
     files = ['1']
     for file in files:
         # read image from file
