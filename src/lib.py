@@ -72,3 +72,22 @@ def grad_totvar(x):
 
   # Restituisci il valore del gradiente della variazione totale
   return -div
+
+
+def next_step(x,f,df): # backtracking procedure for the choice of the steplength
+    alpha=1.1
+    rho = 0.5
+    c1 = 0.25
+    p=-df
+    j=0
+    jmax=10
+    # Armijo rule and max iterations 
+    while((f(x+alpha*p) > f(x)+c1*alpha*df.T@p) and j<jmax):
+        alpha= rho*alpha
+        j+=1
+    # Next step not found , convergence not reached
+    if (j>jmax):
+        return -1
+    else:
+        #print('alpha=',alpha)
+        return alpha
