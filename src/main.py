@@ -130,21 +130,21 @@ def sci_minimize(x0, f, df):
 def show_plt(file, method, lambdas, original, blurred_images, deblurred, figW=14, figH=7):
     len_l = len(lambdas)
     len_b = len(blurred_images)
-    
+
     fig, axs = plt.subplots(len_l+2, len_b, constrained_layout=True, figsize=(figW, figH))
-    fig.suptitle(f'Image = {file}\nMethod = {method}\nMAXITER = {MAXITER}', fontweight='bold', fontsize=18)
+    fig.suptitle(f'Immagine = {file}, Metodo = {method}, Max. Iterazioni = {MAXITER}')
 
     for row, ax in enumerate(axs[:,:]):
         for col, tx in enumerate(ax[:]):
             if(row == 0):
-                tx.set_title(f'Original')
+                tx.set_title(f'Originale')
                 tx.imshow(original, cmap='gray', vmin=0, vmax=1)
             elif(row == 1):
-                tx.set_title(f'σ={blurs[col][1]} , dim={blurs[col][0]}x{blurs[col][0]}')
+                tx.set_title(f'sigma={blurs[col][1]} , dim={blurs[col][0]}x{blurs[col][0]}')
                 tx.imshow(blurred_images[col][0], cmap='gray', vmin=0, vmax=1)
             else:
                 coord = (row-2)*(len_b) + col
-                tx.set_title(f'Lambda={lambdas[row-2]}')
+                tx.set_title(f'lambda={lambdas[row-2]}')
                 tx.imshow(deblurred[coord], cmap='gray', vmin=0, vmax=1)
 
     plt.show()
@@ -172,23 +172,23 @@ if __name__ == '__main__':
         print('MAXITER deve essere un numero intero!')
         exit()
 
-    # default lambdas
-    lambdas = [1,2,3,4]
+    # Default lambdas
+    lambdas = [0.02,0.04,0.8,0.16]
     try:
         if(len(args) > 3):
             lambdas = np.array(args[3:]).astype(np.float64)
     except:
-        print('Le λ devono essere numeri!')
+        print('Le lambda devono essere numeri!')
         exit()
 
     # files = os.listdir('img/')
     files = ['1']
     for file in files:
-        # read image from file
+        # Read image from file
         original = phase0(file)
-        # execute phase1 and get blurred_images
+        # Execute phase1 and get blurred_images
         blurred_images = phase1(original)
-        # execute with a regularization choosen with method param
+        # Execute with a regularization choosen with method param
         deblurred = phasen_multi(lambdas, blurred_images, method, minFun)
 
         show_plt(file, method, lambdas, original, blurred_images, deblurred)
