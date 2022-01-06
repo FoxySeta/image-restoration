@@ -66,7 +66,7 @@ def phase1(img):
         # Generate noise
         noise = np.random.normal(size=img.shape) * 0.05
         # Apply blur and noise
-        b = lib.A(img, K) + noise
+        b = (lib.A(img, K) + noise)
         PSNR = metrics.peak_signal_noise_ratio(img, b)
         MSE = metrics.mean_squared_error(img, b)
         bs.append((b, PSNR, MSE, K))
@@ -78,6 +78,7 @@ def phasen(blurred, l, phi_dphi, minimize):
     method_fns =  f_generator(l, phi_dphi[0], phi_dphi[1])
     f, df = method_fns(blurred[3],b)
     deblurred = minimize(np.zeros(b.shape), f, df)
+    # TODO: look into values exceeding the vmax=1 range
     PSNR = metrics.peak_signal_noise_ratio(deblurred/255, b)
     MSE = metrics.mean_squared_error(deblurred, b)
     return (deblurred, PSNR, MSE)
