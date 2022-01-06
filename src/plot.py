@@ -38,6 +38,7 @@ def plot_methods():
         squeeze=False, constrained_layout=True,
         figsize=(9,9)
     )
+    plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=None, hspace=None)
     fig.suptitle(f'Immagini corrotte e ripristinate con varie tecniche')
 
     blurred_images = []
@@ -75,4 +76,4 @@ if __name__ == '__main__':
     action = args[0]
     plt_common()
     actions[action]()
-    plt.savefig(f'report/{action}.pgf', dpi=150)
+    plt.savefig(f'report/{action}.pgf', dpi=250)

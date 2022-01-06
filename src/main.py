@@ -77,8 +77,10 @@ def phasen(blurred, l, phi_dphi, minimize):
     b = blurred[0]
     method_fns =  f_generator(l, phi_dphi[0], phi_dphi[1])
     f, df = method_fns(blurred[3],b)
-    return minimize(np.zeros(b.shape), f, df)
-
+    deblurred = minimize(np.zeros(b.shape), f, df)
+    PSNR = metrics.peak_signal_noise_ratio(deblurred/255, b)
+    MSE = metrics.mean_squared_error(deblurred, b)
+    return (deblurred, PSNR, MSE)
 
 def phasen_multi(lambdas, blurred_images, method='naive', minFun='scipy'):
     deblurred = []
@@ -145,7 +147,7 @@ def show_plt(file, method, lambdas, original, blurred_images, deblurred, figW=14
             else:
                 coord = (row-2)*(len_b) + col
                 tx.set_title(f'lambda={lambdas[row-2]}')
-                tx.imshow(deblurred[coord], cmap='gray', vmin=0, vmax=1)
+                tx.imshow(deblurred[coord][0], cmap='gray', vmin=0, vmax=1)
 
     plt.show()
 
