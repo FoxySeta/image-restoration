@@ -50,7 +50,6 @@ def minimize(x0,f,df,maxiter,abs_stop) -> np.ndarray:
 
         # calculate new x with 'step' as alpha and '-grad' as the direction
         x_last=x_last-step*grad
-
     return x_last
 
 # read image data from file
