@@ -192,7 +192,7 @@ def plot_iterations():
 
         for measurement_name in measurers:
             print(f'done for {measurement_name}-{solver_name}')
-            plt.plot(x, ys[measurement_name], 'o', color='black');
+            plt.plot(x, ys[measurement_name], '-o', color='black');
             plt.savefig(f'report/iterations-{measurement_name}-{solver_name}.pgf')
             plt.close()
 
