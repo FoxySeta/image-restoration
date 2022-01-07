@@ -1,5 +1,7 @@
 import main
 import sys
+import numpy as np
+from scipy.optimize import minimize as sciminimize
 import matplotlib
 import matplotlib.pyplot as plt
 
@@ -59,7 +61,7 @@ def plot_methods():
             # Deblur each image with the appropriate metho/minimization function
             phi_dphi = (main.methods[method[0]]['phi'], main.methods[method[0]]['dphi'])
             minFun = main.sci_minimize if method[1] == 'scipy' else main.our_minimize
-            deblurred = main.phasen(blurred, l, phi_dphi, minFun)
+            deblurred = main.phasen(blurred, l, phi_dphi, minFun, main.MAXITER)
             if i == 0:
                 axs[j+1][i].set_ylabel(method[2])
             axs[j+1][i].imshow(deblurred, cmap='gray', vmin=0, vmax=1)
@@ -115,7 +117,7 @@ def plot_vars():
             for i, method in enumerate(methods):
                 phi_dphi = (main.methods[method[0]]['phi'], main.methods[method[0]]['dphi'])
                 minFun = main.sci_minimize if method[1] == 'scipy' else main.our_minimize
-                deblurred = main.phasen(blurred, args['lambda'], phi_dphi, minFun)
+                deblurred = main.phasen(blurred, args['lambda'], phi_dphi, minFun, main.MAXITER)
                 table[i].append((deblurred[1],deblurred[2]))
 
         f = open('report/vars-' + params['iterate_over'] + '.tex', 'w+')
@@ -150,15 +152,61 @@ def print_tuple(tpl):
         res += str(round(item, decimal_places)) + ','
     return res[:-1]+')'
 
+def plot_iterations():
+    image = '1'
+    blur = (9, 1.3)
+    maxiter_upper = 10
+    l = 0.04
+
+    original = main.phase0(image)
+    blurred = main.blur(original, blur)
+    # TODO: gradient method (?)
+    solvers = {
+        'CG': main.sci_minimize,
+        'G': main.our_minimize
+    }
+    measurers = {
+        # error measurement
+        'error': lambda original, deblurred, f, df: np.linalg.norm(deblurred-original)/np.linalg.norm(original),
+        # target function measurement
+        'objective': lambda _, deblurred, f, df: f(deblurred),
+        # gradient norm measurement
+        'gradient': lambda _, deblurred, f, df: np.linalg.norm(df(deblurred))
+    }
+    for solver_name, solver in solvers.items():
+        x = np.linspace(1, maxiter_upper, maxiter_upper)
+        ys = {}
+        for measurement_name in measurers:
+            ys[measurement_name] = []
+
+        deblurred=blurred[0]
+        for _ in range(maxiter_upper):
+            b = blurred[0]
+            phi_dphi = (main.methods['tv']['phi'], main.methods['tv']['dphi'])
+            method_fns =  main.f_generator(l, phi_dphi[0], phi_dphi[1])
+            f, df = method_fns(blurred[3],deblurred)
+            # run one iteration for each call
+            deblurred = solver(np.zeros(b.shape), f, df, 1)
+            for measurement_name, measure in measurers.items():
+                ys[measurement_name].append(measure(original, deblurred, f, df))
+
+        for measurement_name in measurers:
+            print(f'done for {measurement_name}-{solver_name}')
+            plt.plot(x, ys[measurement_name], 'o', color='black');
+            plt.savefig(f'report/iterations-{measurement_name}-{solver_name}.pgf')
+            plt.close()
+
 actions = {
     'methods': plot_methods,
-    'vars': plot_vars
+    'vars': plot_vars,
+    'iterations': plot_iterations
 }
 
 if __name__ == '__main__':
+    print('NOTA: questo file assume l\'esistnza di una cartella report')
     args = sys.argv[1:]
     if(len(args) == 0 or args[0] not in actions):
-        print('Esempio di esecuzione:\npython plot.py [methods|vars]')
+        print('Esempio di esecuzione:\npython plot.py [methods|vars|iterations]')
         exit()
 
     action = args[0]

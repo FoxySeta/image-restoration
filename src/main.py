@@ -80,11 +80,11 @@ def phase1(img):
         bs.append(blur(img, blur_spec))
     return bs
 
-def phasen(blurred, l, phi_dphi, minimize):
+def phasen(blurred, l, phi_dphi, minimize, maxiter):
     b = blurred[0]
     method_fns =  f_generator(l, phi_dphi[0], phi_dphi[1])
     f, df = method_fns(blurred[3],b)
-    deblurred = minimize(np.zeros(b.shape), f, df)
+    deblurred = minimize(np.zeros(b.shape), f, df, maxiter)
     # TODO: look into values exceeding the vmax=1 range
     PSNR = metrics.peak_signal_noise_ratio(deblurred/255, b)
     MSE = metrics.mean_squared_error(deblurred, b)
@@ -97,7 +97,7 @@ def phasen_multi(lambdas, blurred_images, method='naive', minFun='scipy'):
     
     for l in lambdas:
         for blurred in blurred_images:
-            deblurred.append(phasen(blurred, l, phi_dphi, minimizeFun))
+            deblurred.append(phasen(blurred, l, phi_dphi, minimizeFun, MAXITER))
     return deblurred
 
 '''
@@ -126,15 +126,15 @@ def f_generator(l, regulating_term, regulating_term_grad):
     return hardcode_f
 
 '''
-    our_minimize = (x0, f, df) -> matrix
+    our_minimize = (x0, f, df, maxiter) -> matrix
 '''
-def our_minimize(x0, f, df):
+def our_minimize(x0, f, df, maxiter):
     return np.reshape(minimize(x0, f, df,MAXITER,MAXITER*2), x0.shape)
 
 '''
-    sci_minimize = (x0, f, df) -> matrix
+    sci_minimize = (x0, f, df, maxiter) -> matrix
 '''
-def sci_minimize(x0, f, df):
+def sci_minimize(x0, f, df, maxiter):
     return np.reshape(sciminimize(f, x0, method='CG', jac=df, options={'maxiter':MAXITER}).x, x0.shape)
 
 def show_plt(file, method, lambdas, original, blurred_images, deblurred, figW=14, figH=7):
