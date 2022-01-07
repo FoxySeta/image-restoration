@@ -35,10 +35,9 @@ def minimize(x0,f,df,maxiter,abs_stop) -> np.ndarray:
     k=0
 
     # Stopping criteria 
-    # k < maxiter -1 ( -1 to prevent out of bounds )
-    while (np.linalg.norm(df(x_last))>abs_stop and k < maxiter-1):
-        k=k+1
-        grad = df(x_last) # The direction is given by the gradient of the last iteration
+    while (np.linalg.norm(df(x_last))>abs_stop and k < maxiter):
+        # The direction is given by the gradient of the last iteration
+        grad = df(x_last) 
 
         # Backtracking step
         step = lib.next_step(x_last,f,grad)
@@ -48,6 +47,7 @@ def minimize(x0,f,df,maxiter,abs_stop) -> np.ndarray:
 
         # calculate new x with 'step' as alpha and '-grad' as the direction
         x_last=x_last-step*grad
+        k=k+1
     return x_last
 
 # read image data from file
@@ -129,13 +129,13 @@ def f_generator(l, regulating_term, regulating_term_grad):
     our_minimize = (x0, f, df, maxiter) -> matrix
 '''
 def our_minimize(x0, f, df, maxiter):
-    return np.reshape(minimize(x0, f, df,MAXITER,MAXITER*2), x0.shape)
+    return np.reshape(minimize(x0, f, df,maxiter,np.finfo(np.float64).eps), x0.shape)
 
 '''
     sci_minimize = (x0, f, df, maxiter) -> matrix
 '''
 def sci_minimize(x0, f, df, maxiter):
-    return np.reshape(sciminimize(f, x0, method='CG', jac=df, options={'maxiter':MAXITER}).x, x0.shape)
+    return np.reshape(sciminimize(f, x0, method='CG', jac=df, options={'maxiter':maxiter}).x, x0.shape)
 
 def show_plt(file, method, lambdas, original, blurred_images, deblurred, figW=14, figH=7):
     len_l = len(lambdas)

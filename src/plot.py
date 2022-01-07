@@ -5,6 +5,9 @@ from scipy.optimize import minimize as sciminimize
 import matplotlib
 import matplotlib.pyplot as plt
 
+# TODO: remove
+from skimage import data
+
 # Number of decimal places to round for plotting
 decimal_places = 3
 # List of methods to plot. The structur for each tuple is:
@@ -155,15 +158,16 @@ def print_tuple(tpl):
 def plot_iterations():
     image = '1'
     blur = (9, 1.3)
-    maxiter_upper = 10
+    maxiter_upper = 30
     l = 0.04
 
     original = main.phase0(image)
+    # original = data.camera().astype(np.float64)/255
     blurred = main.blur(original, blur)
     # TODO: gradient method (?)
     solvers = {
-        'CG': main.sci_minimize,
-        'G': main.our_minimize
+        'G': main.our_minimize,
+        'CG': main.sci_minimize
     }
     measurers = {
         # error measurement
@@ -179,14 +183,12 @@ def plot_iterations():
         for measurement_name in measurers:
             ys[measurement_name] = []
 
-        deblurred=blurred[0]
+        deblurred=blurred[0].copy()
+        method_fns =  main.f_generator(l, main.methods['tv']['phi'], main.methods['tv']['dphi'])
+        f, df = method_fns(blurred[3],blurred[0])
         for _ in range(maxiter_upper):
-            b = blurred[0]
-            phi_dphi = (main.methods['tv']['phi'], main.methods['tv']['dphi'])
-            method_fns =  main.f_generator(l, phi_dphi[0], phi_dphi[1])
-            f, df = method_fns(blurred[3],deblurred)
             # run one iteration for each call
-            deblurred = solver(np.zeros(b.shape), f, df, 1)
+            deblurred = solver(deblurred, f, df, 2)
             for measurement_name, measure in measurers.items():
                 ys[measurement_name].append(measure(original, deblurred, f, df))
 
@@ -194,6 +196,9 @@ def plot_iterations():
             print(f'done for {measurement_name}-{solver_name}')
             plt.plot(x, ys[measurement_name], '-o', color='black');
             plt.savefig(f'report/iterations-{measurement_name}-{solver_name}.pgf')
+            plt.close()
+            plt.imshow(original, cmap='gray', vmin=0, vmax=1)
+            plt.savefig(f'report/iterations-{measurement_name}-{solver_name}-img.pgf')
             plt.close()
 
 actions = {
@@ -203,7 +208,7 @@ actions = {
 }
 
 if __name__ == '__main__':
-    print('NOTA: questo file assume l\'esistnza di una cartella report')
+    print('NOTA: questo file assume l\'esistenza di una cartella report')
     args = sys.argv[1:]
     if(len(args) == 0 or args[0] not in actions):
         print('Esempio di esecuzione:\npython plot.py [methods|vars|iterations]')
