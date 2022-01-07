@@ -56,21 +56,28 @@ def phase0(name):
     img = plt.imread(path).astype(np.float64)
     return img
 
+'''
+    Blurs an image matrix with the given parameters then applies gaussian noise
+    blur = (kernel length, standard deviation)
+    noise_factor = float
+'''
+def blur(img, blur, noise_factor=0.05):
+    # Generate a blurring filter
+    K = lib.psf_fft(lib.gaussian_kernel(*blur), blur[0], img.shape)
+    # Generate noise
+    noise = np.random.normal(size=img.shape) * noise_factor
+    # Apply blur and noise
+    b = (lib.A(img, K) + noise)
+    PSNR = metrics.peak_signal_noise_ratio(img, b)
+    MSE = metrics.mean_squared_error(img, b)
+    return (b, PSNR, MSE, K)
+
 # Apply blur and noise then return (the new image, PSF, PSNR and MSE, K)
 def phase1(img):
     bs = []
     # Iterate for each blurs
-    for blur in blurs:
-        # Generate a blurring filter
-        K = lib.psf_fft(lib.gaussian_kernel(*blur), blur[0], img.shape)
-        # Generate noise
-        noise = np.random.normal(size=img.shape) * 0.05
-        # Apply blur and noise
-        b = (lib.A(img, K) + noise)
-        PSNR = metrics.peak_signal_noise_ratio(img, b)
-        MSE = metrics.mean_squared_error(img, b)
-        bs.append((b, PSNR, MSE, K))
-
+    for blur_spec in blurs:
+        bs.append(blur(img, blur_spec))
     return bs
 
 def phasen(blurred, l, phi_dphi, minimize):
