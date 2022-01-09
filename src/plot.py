@@ -221,7 +221,6 @@ def plot_aggregations():
 def plot_iterations():
     image = '1'
     blur = (9, 1.3)
-    maxiter_upper = 30
     l = 0.04
 
     original = main.phase0(image)
@@ -232,6 +231,14 @@ def plot_iterations():
         'G': main.our_minimize,
         'CG': main.sci_minimize
     }
+    solvers_legend = [
+        'gradiente',
+        'gradienti coniugati'
+    ]
+    colors = [
+        'blue',
+        'red'
+    ]
     measurers = {
         # error measurement
         'error': lambda original, deblurred, f, df: np.linalg.norm(deblurred-original)/np.linalg.norm(original),
@@ -240,8 +247,8 @@ def plot_iterations():
         # gradient norm measurement
         'gradient': lambda _, deblurred, f, df: np.linalg.norm(df(deblurred))
     }
-    for solver_name, solver in solvers.items():
-        x = np.linspace(1, maxiter_upper, maxiter_upper)
+    for i, (solver_name, solver) in enumerate(solvers.items()):
+        x = np.linspace(1, main.MAXITER, main.MAXITER)
         ys = {}
         for measurement_name in measurers:
             ys[measurement_name] = []
@@ -249,7 +256,7 @@ def plot_iterations():
         deblurred=blurred[0].copy()
         method_fns =  main.f_generator(l, main.methods['tv']['phi'], main.methods['tv']['dphi'])
         f, df = method_fns(blurred[3],blurred[0])
-        for _ in range(maxiter_upper):
+        for _ in range(main.MAXITER):
             # run one iteration for each call
             deblurred = solver(deblurred, f, df, 2)
             for measurement_name, measure in measurers.items():
@@ -257,12 +264,12 @@ def plot_iterations():
 
         for measurement_name in measurers:
             print(f'done for {measurement_name}-{solver_name}')
-            plt.plot(x, ys[measurement_name], '-o', color='black');
-            plt.savefig(f'report/iterations-{measurement_name}-{solver_name}.pgf')
-            plt.close()
-            plt.imshow(original, cmap='gray', vmin=0, vmax=1)
-            plt.savefig(f'report/iterations-{measurement_name}-{solver_name}-img.pgf')
-            plt.close()
+            plt.figure(measurement_name)
+            plt.plot(x, ys[measurement_name], '-', color=colors[i]);
+    for measurement_name in measurers:
+        plt.figure(measurement_name)
+        plt.legend(solvers_legend)
+        plt.savefig(f'report/iterations-{measurement_name}.pgf')
 
 actions = {
     'methods': plot_methods,
