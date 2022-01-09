@@ -35,7 +35,7 @@ def plt_common():
 
 
 def plot_methods():
-    images = ['1', 'A', 'B']
+    images = ["1", "A", "B"]
     blur_factor = 2  # Selects which type of blur to use from main.blurs
     l = 0.04  # Lambda value common for all methods
 
@@ -204,7 +204,7 @@ def print_float(fl):
 
 def plot_aggregations():
     # (sigma, kern len), noise, lamda
-    images = ('1', '2', '3', '4', '5', '6', '7', '8')
+    images = ("1", "2", "3", "4", "5", "6", "7", "8")
     label = (
         lambda p: "$("
         + print_float(p["blur"][1])
@@ -265,7 +265,9 @@ def plot_iterations():
     colors = ["blue", "red"]
     measurers = {
         # error measurement
-        "error": lambda original, deblurred, f, df: metrics.peak_signal_noise_ratio(original, deblurred)
+        "error": lambda original, deblurred, f, df: metrics.peak_signal_noise_ratio(
+            original, deblurred
+        ),
         # target function measurement
         "objective": lambda original, deblurred, f, df: f(deblurred),
         # gradient norm measurement
