@@ -103,8 +103,6 @@ def plot_vars():
     # Plot result differences as defaults change
     for var in variations:
         table = []
-        for _ in enumerate(methods):
-            table.append([])
         # Make a copy of the default arguments to avoid overwriting
         params = defaults.copy()
         params.update(var)
@@ -125,7 +123,7 @@ def plot_vars():
 
         f = open('report/vars-' + params['iterate_over'] + '.tex', 'w+')
         x_labels = ('naive', 'tykhonov (sci)', 'tykhonov (our)', 'tv')
-        y_labels = map(params['label'], columns)
+        y_labels = tuple(map(params['label'], columns))
         f.write(plot_table(table, x_labels, y_labels))
         f.close()
 
@@ -134,23 +132,30 @@ def plot_vars():
     table where each cell shows a k-ary tuple
 '''
 def plot_table(tbl, x_labels = None, y_labels=None):
+    if len(x_labels) != len(tbl):
+        raise Exception('numers of x labels must match the number of rows')
+    if len(y_labels) != len(tbl[0]):
+        raise Exception('numers of y labels must match the number of columns')
+
     columns = len(tbl[0])
     if x_labels != None:
         columns = columns + 1
 
-    res = '\\begin{NiceTabular}{|' + ('c|' * columns) + '}\\hline\n'
+    res = '\\begin{tabular}{|' + ('c|' * columns) + '}\\hline\n'
     if y_labels != None:
+        if x_labels != None:
+            res+='& '
         for cell in y_labels:
             res += cell + ' &'
-        res = res[:-1] + '\\\\\\hline\\hline\n'
+        res = res[:-1] + '\\\\\\hhline{|' + ('=|' * columns) + '}\n'
 
     for i, row in enumerate(tbl):
+        if x_labels != None:
+            res += x_labels[i] + ' &'
         for cell in row:
-            if x_labels != None:
-                res += x_labels[i] + ' &'
             res += ' $' + print_tuple(cell) + '$ &'
         res = res[:-1] + '\\\\\\hline\n' # remove the last & and add \\\hline + newline
-    return res+'\\end{NiceTabular}'
+    return res+'\\end{tabular}'
 
 '''
     Prints a n-ary tuple rounding values appropriately
