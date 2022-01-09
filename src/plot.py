@@ -1,12 +1,9 @@
 import main
 import sys
 import numpy as np
-from scipy.optimize import minimize as sciminimize
 import matplotlib
 import matplotlib.pyplot as plt
-
-# TODO: remove
-from skimage import data
+from skimage import metrics
 
 # Number of decimal places to round for plotting
 decimal_places = 3
@@ -33,13 +30,12 @@ def plt_common():
 
 
 """
-    plots the three methods available to show differences side by side
+    Plots the three methods available to show differences side by side
 """
 
 
 def plot_methods():
-    # images = ['1', 'A', 'B']
-    images = ["1", "2", "3"]
+    images = ['1', 'A', 'B']
     blur_factor = 2  # Selects which type of blur to use from main.blurs
     l = 0.04  # Lambda value common for all methods
 
@@ -201,15 +197,14 @@ def print_float(fl):
 
 
 """
-    plots the differences in PSNR and MSE as a triple of data changes all
+    Plots the differences in PSNR and MSE as a triple of data changes all
     solved with the TV method
 """
 
 
 def plot_aggregations():
     # (sigma, kern len), noise, lamda
-    # images = ('1', '2', '3', '4', '5', '6', '7', '8')
-    images = ("1", "2")  # , '3', '4', '5', '6', '7', '8')
+    images = ('1', '2', '3', '4', '5', '6', '7', '8')
     label = (
         lambda p: "$("
         + print_float(p["blur"][1])
@@ -270,12 +265,11 @@ def plot_iterations():
     colors = ["blue", "red"]
     measurers = {
         # error measurement
-        "error": lambda original, deblurred, f, df: np.linalg.norm(deblurred - original)
-        / np.linalg.norm(original),
+        "error": lambda original, deblurred, f, df: metrics.peak_signal_noise_ratio(original, deblurred)
         # target function measurement
-        "objective": lambda _, deblurred, f, df: f(deblurred),
+        "objective": lambda original, deblurred, f, df: f(deblurred),
         # gradient norm measurement
-        "gradient": lambda _, deblurred, f, df: np.linalg.norm(df(deblurred)),
+        "gradient": lambda original, deblurred, f, df: np.linalg.norm(df(deblurred)),
     }
     for i, (solver_name, solver) in enumerate(solvers.items()):
         x = np.linspace(1, main.MAXITER, main.MAXITER)
