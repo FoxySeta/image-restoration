@@ -1,10 +1,11 @@
 \documentclass[a4paper]{article}
 \usepackage[italian]{babel}
-
 \usepackage{epigraph}
+\usepackage{hhline}
+% plotting
+\usepackage{pgf}
 
-\title{Ricostruzione di immagini \\
-\large Relazione del progetto per l'insegnamento di Calcolo numerico}
+\title{Ricostruzione di immagini \\ \large Relazione del progetto per l'insegnamento di Calcolo numerico}
 \author{
   R. Gianmaria,
   L. Tagliavini,
@@ -29,9 +30,50 @@ conoscenza}
 
 \section{Introduzione}
 
+\begin{figure}
+    \begin{center}
+        \scalebox{0.65}{\input{methods.pgf}}
+    \end{center}
+    \caption{bla bla bla}
+\end{figure}
+
 \section{Strumenti}
 
+\begin{figure}
+    \begin{center}
+        \scalebox{0.65}{\input{vars-blur.tex}}
+    \end{center}
+    \begin{center}
+        \scalebox{0.65}{\input{vars-noise.tex}}
+    \end{center}
+    \begin{center}
+      \scalebox{0.65}{\input{vars-lambda.tex}}
+    \end{center}
+    \caption{bla bla bla}
+\end{figure}
+
 \section{Procedimento}
+
+\begin{figure}
+    \begin{center}
+        \scalebox{0.65}{\input{iterations-error.pgf}}
+    \end{center}
+    \caption{error}
+\end{figure}
+
+\begin{figure}
+    \begin{center}
+        \scalebox{0.65}{\input{iterations-objective.pgf}}
+    \end{center}
+    \caption{objective}
+\end{figure}
+
+\begin{figure}
+    \begin{center}
+        \scalebox{0.65}{\input{iterations-gradient.pgf}}
+    \end{center}
+    \caption{gradient}
+\end{figure}
 
 \section{Risultati}
 
