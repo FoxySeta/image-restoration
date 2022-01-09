@@ -106,8 +106,9 @@ def plot_vars():
         # Make a copy of the default arguments to avoid overwriting
         params = defaults.copy()
         params.update(var)
-        columns = params[params['iterate_over']]
-        for v in columns:
+        rows = params[params['iterate_over']]
+        for i, v in enumerate(rows):
+            table.append([])
             # Build the arguments for this row of the table
             args = defaults.copy()
             args[params['iterate_over']] = v
@@ -115,15 +116,15 @@ def plot_vars():
             blurred = main.blur(img, args['blur'], args['noise'])
 
             # Deblur the image accordingly with each method
-            for i, method in enumerate(methods):
+            for method in methods:
                 phi_dphi = (main.methods[method[0]]['phi'], main.methods[method[0]]['dphi'])
                 minFun = main.sci_minimize if method[1] == 'scipy' else main.our_minimize
                 deblurred = main.phasen(blurred, args['lambda'], phi_dphi, minFun, main.MAXITER)
                 table[i].append((deblurred[1],deblurred[2]))
 
         f = open('report/vars-' + params['iterate_over'] + '.tex', 'w+')
-        x_labels = ('naive', 'tykhonov (sci)', 'tykhonov (our)', 'tv')
-        y_labels = tuple(map(params['label'], columns))
+        x_labels = tuple(map(params['label'], rows))
+        y_labels = ('naive', 'tykhonov (sci)', 'tykhonov (our)', 'tv')
         f.write(plot_table(table, x_labels, y_labels))
         f.close()
 
@@ -164,7 +165,7 @@ def plot_table(tbl, x_labels = None, y_labels=None):
 def print_tuple(tpl):
     res='('
     for item in tpl:
-        res += str(round(item, decimal_places)) + ','
+        res += str(f'%.{decimal_places}f' % item) + ','
     return res[:-1]+')'
 
 def plot_iterations():
