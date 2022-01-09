@@ -41,7 +41,7 @@ def plot_methods():
     # Setup the plot layout
     fig, axs = plt.subplots(
         1+len(methods), len(images),
-        squeeze=False, constrained_layout=True,
+        squeeze=False,
         figsize=(9,9)
     )
     plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=None, hspace=None)
@@ -67,7 +67,7 @@ def plot_methods():
             deblurred = main.phasen(blurred, l, phi_dphi, minFun, main.MAXITER)
             if i == 0:
                 axs[j+1][i].set_ylabel(method[2])
-            axs[j+1][i].imshow(deblurred, cmap='gray', vmin=0, vmax=1)
+            axs[j+1][i].imshow(deblurred[0], cmap='gray', vmin=0, vmax=1)
     plt.savefig('report/methods.pgf')
 
 '''
@@ -103,8 +103,6 @@ def plot_vars():
     # Plot result differences as defaults change
     for var in variations:
         table = []
-        for _ in enumerate(methods):
-            table.append([])
         # Make a copy of the default arguments to avoid overwriting
         params = defaults.copy()
         params.update(var)
@@ -124,26 +122,40 @@ def plot_vars():
                 table[i].append((deblurred[1],deblurred[2]))
 
         f = open('report/vars-' + params['iterate_over'] + '.tex', 'w+')
-        labels = map(params['label'], columns)
-        f.write(plot_table(table, labels))
+        x_labels = ('naive', 'tykhonov (sci)', 'tykhonov (our)', 'tv')
+        y_labels = tuple(map(params['label'], columns))
+        f.write(plot_table(table, x_labels, y_labels))
         f.close()
 
 '''
     Takes in a m \times n \times k matrix and plots it as an m \times n
     table where each cell shows a k-ary tuple
 '''
-def plot_table(tbl, y_labels=None):
-    res = '\\begin{NiceTabular}{|' + ('c|' * len(tbl[0])) + '}\\hline\n'
+def plot_table(tbl, x_labels = None, y_labels=None):
+    if len(x_labels) != len(tbl):
+        raise Exception('numers of x labels must match the number of rows')
+    if len(y_labels) != len(tbl[0]):
+        raise Exception('numers of y labels must match the number of columns')
+
+    columns = len(tbl[0])
+    if x_labels != None:
+        columns = columns + 1
+
+    res = '\\begin{tabular}{|' + ('c|' * columns) + '}\\hline\n'
     if y_labels != None:
+        if x_labels != None:
+            res+='& '
         for cell in y_labels:
             res += cell + ' &'
-        res = res[:-1] + '\\\\\\hline\\hline\n'
+        res = res[:-1] + '\\\\\\hhline{|' + ('=|' * columns) + '}\n'
 
-    for row in tbl:
+    for i, row in enumerate(tbl):
+        if x_labels != None:
+            res += x_labels[i] + ' &'
         for cell in row:
             res += ' $' + print_tuple(cell) + '$ &'
         res = res[:-1] + '\\\\\\hline\n' # remove the last & and add \\\hline + newline
-    return res+'\\end{NiceTabular}'
+    return res+'\\end{tabular}'
 
 '''
     Prints a n-ary tuple rounding values appropriately
