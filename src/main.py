@@ -9,6 +9,9 @@ import sys
 # Default MAXITER
 MAXITER = 10
 
+# Default TOLERANCE
+TOLERANCE = 10e-5
+
 # Methods Dictionary
 methods = {
     'naive' : { 
@@ -31,7 +34,7 @@ blurs = ((5, 0.5), (7, 1), (9, 1.3))
 # Function that implement gradient method
 def minimize(x0,f,df,maxiter,abs_stop) -> np.ndarray: 
     #initialize first values
-    x_last = np.zeros((x0.size))
+    x_last = x0
     k=0
 
     # Stopping criteria 
@@ -129,7 +132,7 @@ def f_generator(l, regulating_term, regulating_term_grad):
     our_minimize = (x0, f, df, maxiter) -> matrix
 '''
 def our_minimize(x0, f, df, maxiter):
-    return np.reshape(minimize(x0, f, df,maxiter,np.finfo(np.float64).eps), x0.shape)
+    return np.reshape(minimize(np.copy(x0).reshape(x0.size), f, df,maxiter,TOLERANCE), x0.shape)
 
 '''
     sci_minimize = (x0, f, df, maxiter) -> matrix
