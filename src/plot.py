@@ -53,7 +53,7 @@ def plot_methods():
         original = main.phase0(image)
         # Take only the needed image from the phase1 blurring
         blurred_data = main.phase1(original)[blur_factor]
-        axs[0][i].set_title(f'\\texttt{{{image}.png}}\n$PSNR={round(blurred_data[1],decimal_places)}$\n$MSE={round(blurred_data[2],decimal_places)}$')
+        axs[0][i].set_title(f'\\texttt{{{image}.png}}\n$PSNR={print_float(blurred_data[1])}$\n$MSE={print_float(blurred_data[2])}$')
         if i == 0:
                 axs[0][i].set_ylabel('Originale')
         axs[0][i].imshow(original, cmap='gray', vmin=0, vmax=1)
@@ -87,17 +87,17 @@ def plot_vars():
         {
             'blur': ((5,0.5),(7,1),(9,1.3),(11,1.5),(13,1.6),(15,1.7)),
             'iterate_over': 'blur',
-            'label': lambda b: f'$\\sigma = {b[1]}, {b[0]}\\times {b[0]}$'
+            'label': lambda b: f'$\\sigma = {print_float(b[1])}, {str(b[0])}\\times {str(b[0])}$'
         },
         {
             'noise': (0.01,0.03,0.05,0.07,0.10,0.15,0.25),
             'iterate_over': 'noise',
-            'label': lambda n: f'$z = {round(n, decimal_places)}$'
+            'label': lambda n: f'$z = {print_float(n)}$'
         },
         {
             'lambda': (0.02,0.04,0.08,0.16,0.32,0.64),
             'iterate_over': 'lambda',
-            'label': lambda l: f'$\\lambda = {round(l, decimal_places)}$'
+            'label': lambda l: f'$\\lambda = {print_float(l)}$'
         }
     )
     # Plot result differences as defaults change
@@ -132,7 +132,7 @@ def plot_vars():
     Takes in a m \times n \times k matrix and plots it as an m \times n
     table where each cell shows a k-ary tuple
 '''
-def plot_table(tbl, x_labels = None, y_labels=None):
+def plot_table(tbl, x_labels = None, y_labels=None, c11=''):
     if len(x_labels) != len(tbl):
         raise Exception('numers of x labels must match the number of rows')
     if len(y_labels) != len(tbl[0]):
@@ -145,11 +145,10 @@ def plot_table(tbl, x_labels = None, y_labels=None):
     res = '\\begin{tabular}{|' + ('c|' * columns) + '}\\hline\n'
     if y_labels != None:
         if x_labels != None:
-            res+='& '
+            res+=c11+'& '
         for cell in y_labels:
             res += cell + ' &'
         res = res[:-1] + '\\\\\\hhline{|' + ('=|' * columns) + '}\n'
-
     for i, row in enumerate(tbl):
         if x_labels != None:
             res += x_labels[i] + ' &'
@@ -159,14 +158,65 @@ def plot_table(tbl, x_labels = None, y_labels=None):
     return res+'\\end{tabular}'
 
 '''
-    Prints a n-ary tuple rounding values appropriately
-    NOTE: assumes all values are number-like and can be applied to round()
+    Prints a n-ary tuple rounding values appropriately (with python's formatting)
+    NOTE: assumes all values are number-like and can be rounded
 '''
 def print_tuple(tpl):
     res='('
     for item in tpl:
-        res += str(f'%.{decimal_places}f' % item) + ','
+        res += str(print_float(item)) + ','
     return res[:-1]+')'
+
+'''
+    Prints a float into a string following our plotting convention
+'''
+def print_float(fl):
+    return f'%.{decimal_places}f' % fl
+
+'''
+    plots the differences in PSNR and MSE as a triple of data changes all
+    solved with the TV method
+'''
+def plot_aggregations():
+    # (sigma, kern len), noise, lamda
+    # images = ('1', '2', '3', '4', '5', '6', '7', '8')
+    images = ('1', '2')#, '3', '4', '5', '6', '7', '8')
+    label = lambda p: '$(' + print_float(p['blur'][1]) + ', ' + str(p['blur'][0]) + ', ' + print_float(p['noise']) + ', ' + print_float(p['lambda']) +')$'
+    params = []
+    for blur in ((5,0.5),(11, 1.4),(15,1.7)):
+        for noise in (0.01, 0.13, 0.25):
+            for l in (0.02, 0.8, 0.64):
+                params.append({
+                    'blur': blur,
+                    'noise': noise,
+                    'lambda': l
+                })
+
+    table = []
+    phi_dphi = (main.methods['tv']['phi'], main.methods['tv']['dphi'])
+    for _ in params:
+        table.append([])
+    for image in images:
+        original = main.phase0(image)
+
+        for i, param in enumerate(params):
+            blurred = main.blur(original, param['blur'], param['noise'])
+            deblurred = main.phasen(blurred, param['lambda'], phi_dphi, main.sci_minimize, main.MAXITER)
+            table[i].append((deblurred[1],deblurred[2]))
+        print('Done for aggregations of image: ' + image)
+    # Compute medium and standard deviation
+    for i, row in enumerate(table):
+        row = np.array(row)
+        table[i] = [
+            (np.median(row[:,0]), np.median(row[:,1])),
+            (np.std(row[:,0]), np.std(row[:,1]))
+        ]
+
+    f = open(f'report/aggregations.tex', 'w+')
+    x_labels = tuple(map(label, params))
+    y_labels = ('Media', 'Deviazione Standard')
+    f.write(plot_table(table, x_labels, y_labels, '$(\\sigma, r,n,\\lambda)$'))
+    f.close()
 
 def plot_iterations():
     image = '1'
@@ -217,6 +267,7 @@ def plot_iterations():
 actions = {
     'methods': plot_methods,
     'vars': plot_vars,
+    'aggregations': plot_aggregations,
     'iterations': plot_iterations
 }
 
@@ -224,7 +275,7 @@ if __name__ == '__main__':
     print('NOTA: questo file assume l\'esistenza di una cartella report')
     args = sys.argv[1:]
     if(len(args) == 0 or args[0] not in actions):
-        print('Esempio di esecuzione:\npython plot.py [methods|vars|iterations]')
+        print('Esempio di esecuzione:\npython plot.py [methods|vars|aggregations|iterations]')
         exit()
 
     action = args[0]
