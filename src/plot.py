@@ -265,9 +265,9 @@ def plot_iterations():
     colors = ["blue", "red"]
     measurers = {
         # error measurement
-        "error": lambda original, deblurred, f, df: metrics.peak_signal_noise_ratio(
-            original, deblurred
-        ),
+        "error": lambda original, deblurred, f, df: np.linalg.norm(
+            original - deblurred
+        ) / np.linalg.norm(original),
         # target function measurement
         "objective": lambda original, deblurred, f, df: f(deblurred),
         # gradient norm measurement
