@@ -7,10 +7,10 @@ import os
 import sys
 
 # Default MAXITER
-MAXITER = 60
+MAXITER = 50
 
 # Default TOLERANCE
-TOLERANCE = 10e-5
+TOLERANCE = 10e-3
 
 # Methods Dictionary
 methods = {
@@ -80,25 +80,24 @@ def phase1(img):
     return bs
 
 
-def phasen(blurred, l, phi_dphi, minimize, maxiter):
+def phasen(true_image, blurred, l, phi_dphi, minimize, maxiter):
     b = blurred[0]
     method_fns = f_generator(l, phi_dphi[0], phi_dphi[1])
     f, df = method_fns(blurred[3], b)
     deblurred = minimize(np.zeros(b.shape), f, df, maxiter)
-    # TODO: look into values exceeding the vmax=1 range
-    PSNR = metrics.peak_signal_noise_ratio(deblurred / 255, b)
-    MSE = metrics.mean_squared_error(deblurred, b)
+    PSNR = metrics.peak_signal_noise_ratio(true_image, deblurred)
+    MSE = metrics.mean_squared_error(true_image, deblurred)
     return (deblurred, PSNR, MSE)
 
 
-def phasen_multi(lambdas, blurred_images, method="naive", minFun="scipy"):
+def phasen_multi(true_image, lambdas, blurred_images, method="naive", minFun="scipy"):
     deblurred = []
     phi_dphi = (methods[method]["phi"], methods[method]["dphi"])
     minimizeFun = sci_minimize if minFun == "scipy" else our_minimize
 
     for l in lambdas:
         for blurred in blurred_images:
-            deblurred.append(phasen(blurred, l, phi_dphi, minimizeFun, MAXITER))
+            deblurred.append(phasen(true_image, blurred, l, phi_dphi, minimizeFun, MAXITER))
     return deblurred
 
 
@@ -227,6 +226,6 @@ if __name__ == "__main__":
         # Execute phase1 and get blurred_images
         blurred_images = phase1(original)
         # Execute with a regularization choosen with method param
-        deblurred = phasen_multi(lambdas, blurred_images, method, minFun)
+        deblurred = phasen_multi(original, lambdas, blurred_images, method, minFun)
 
         show_plt(file, method, lambdas, original, blurred_images, deblurred)

@@ -48,10 +48,12 @@ def plot_methods():
     )
     fig.suptitle(f"Immagini corrotte e ripristinate con varie tecniche")
 
+    original_images = []
     blurred_images = []
     for i, image in enumerate(images):
         # Read image from file
         original = main.phase0(image)
+        original_images.append(original)
         # Take only the needed image from the phase1 blurring
         blurred_data = main.phase1(original)[blur_factor]
         axs[0][i].set_title(
@@ -67,7 +69,7 @@ def plot_methods():
             # Deblur each image with the appropriate metho/minimization function
             phi_dphi = (main.methods[method[0]]["phi"], main.methods[method[0]]["dphi"])
             minFun = main.sci_minimize if method[1] == "scipy" else main.our_minimize
-            deblurred = main.phasen(blurred, l, phi_dphi, minFun, main.MAXITER)
+            deblurred = main.phasen(original_images[i], blurred, l, phi_dphi, minFun, main.MAXITER)
             if i == 0:
                 axs[j + 1][i].set_ylabel(method[2])
             axs[j + 1][i].imshow(deblurred[0], cmap="gray", vmin=0, vmax=1)
@@ -131,7 +133,7 @@ def plot_vars():
                     main.sci_minimize if method[1] == "scipy" else main.our_minimize
                 )
                 deblurred = main.phasen(
-                    blurred, args["lambda"], phi_dphi, minFun, main.MAXITER
+                    img, blurred, args["lambda"], phi_dphi, minFun, main.MAXITER
                 )
                 table[i].append((deblurred[1], deblurred[2]))
 
@@ -232,7 +234,7 @@ def plot_aggregations():
         for i, param in enumerate(params):
             blurred = main.blur(original, param["blur"], param["noise"])
             deblurred = main.phasen(
-                blurred, param["lambda"], phi_dphi, main.sci_minimize, main.MAXITER
+                original, blurred, param["lambda"], phi_dphi, main.sci_minimize, main.MAXITER
             )
             table[i].append((deblurred[1], deblurred[2]))
         print("Done for aggregations of image: " + image)
@@ -257,9 +259,7 @@ def plot_iterations():
     l = 0.04
 
     original = main.phase0(image)
-    # original = data.camera().astype(np.float64)/255
     blurred = main.blur(original, blur)
-    # TODO: gradient method (?)
     solvers = {"G": main.our_minimize, "CG": main.sci_minimize}
     solvers_legend = ["gradiente", "gradienti coniugati"]
     colors = ["blue", "red"]
