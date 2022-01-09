@@ -3,13 +3,14 @@ from numpy import fft
 
 # Create a Gaussian kernel of size kernlen and standard deviation sigma
 def gaussian_kernel(kernlen, sigma):
-    x = np.linspace(- (kernlen // 2), kernlen // 2, kernlen)    
+    x = np.linspace(-(kernlen // 2), kernlen // 2, kernlen)
     # Unidimensional Gaussian kernel
-    kern1d = np.exp(- 0.5 * (x**2 / sigma))
+    kern1d = np.exp(-0.5 * (x ** 2 / sigma))
     # Bidimensional Gaussian kernel
     kern2d = np.outer(kern1d, kern1d)
     # Normalization
     return kern2d / kern2d.sum()
+
 
 # Compute the FFT of the kernel 'K' of size 'd' padding with the zeros necessary
 # to match the size of 'shape'
@@ -26,68 +27,72 @@ def psf_fft(K, d, shape):
     K_otf = fft.fft2(K_pr)
     return K_otf
 
+
 # Multiplication by A
 def A(x, K):
-  x = fft.fft2(x)
-  return np.real(fft.ifft2(K * x))
+    x = fft.fft2(x)
+    return np.real(fft.ifft2(K * x))
+
 
 # Multiplication by A transpose
 def AT(x, K):
-  x = fft.fft2(x)
-  return np.real(fft.ifft2(np.conj(K) * x))
+    x = fft.fft2(x)
+    return np.real(fft.ifft2(np.conj(K) * x))
+
 
 eps = 1e-2
 
 # Variazione totale
 def totvar(x):
-  # Calcola il gradiente di x
-  dx, dy = np.gradient(x)
-  n2 = np.square(dx) + np.square(dy)
+    # Calcola il gradiente di x
+    dx, dy = np.gradient(x)
+    n2 = np.square(dx) + np.square(dy)
 
-  # Calcola la variazione totale di x
-  tv = np.sqrt(n2 + eps**2).sum()
-  return tv
+    # Calcola la variazione totale di x
+    tv = np.sqrt(n2 + eps ** 2).sum()
+    return tv
+
 
 # Gradiente della variazione totale
 def grad_totvar(x):
-  # Calcola il numeratore della frazione
-  dx, dy = np.gradient(x)
+    # Calcola il numeratore della frazione
+    dx, dy = np.gradient(x)
 
-  # Calcola il denominatore della frazione
-  n2 = np.square(dx) + np.square(dy)
-  den = np.sqrt(n2 + eps**2)
+    # Calcola il denominatore della frazione
+    n2 = np.square(dx) + np.square(dy)
+    den = np.sqrt(n2 + eps ** 2)
 
-  # Calcola le due componenti di F dividendo il gradiente per il denominatore
-  Fx = dx / den
-  Fy = dy / den
+    # Calcola le due componenti di F dividendo il gradiente per il denominatore
+    Fx = dx / den
+    Fy = dy / den
 
-  # Calcola la derivata orizzontale di Fx 
-  dFdx = np.gradient(Fx, axis=0)
-  
-  # Calcola la derivata verticale di Fy
-  dFdy = np.gradient(Fy, axis=1)
+    # Calcola la derivata orizzontale di Fx
+    dFdx = np.gradient(Fx, axis=0)
 
-  # Calcola la divergenza 
-  div = (dFdx + dFdy)
+    # Calcola la derivata verticale di Fy
+    dFdy = np.gradient(Fy, axis=1)
 
-  # Restituisci il valore del gradiente della variazione totale
-  return -div
+    # Calcola la divergenza
+    div = dFdx + dFdy
+
+    # Restituisci il valore del gradiente della variazione totale
+    return -div
 
 
-def next_step(x,f,df): # backtracking procedure for the choice of the steplength
-    alpha=1.1
+def next_step(x, f, df):  # backtracking procedure for the choice of the steplength
+    alpha = 1.1
     rho = 0.5
     c1 = 0.25
-    p=-df
-    j=0
-    jmax=10
-    # Armijo rule and max iterations 
-    while((f(x+alpha*p) > f(x)+c1*alpha*df.T@p) and j<jmax):
-        alpha= rho*alpha
-        j+=1
+    p = -df
+    j = 0
+    jmax = 10
+    # Armijo rule and max iterations
+    while (f(x + alpha * p) > f(x) + c1 * alpha * df.T @ p) and j < jmax:
+        alpha = rho * alpha
+        j += 1
     # Next step not found , convergence not reached
-    if (j>jmax):
+    if j > jmax:
         return -1
     else:
-        #print('alpha=',alpha)
+        # print('alpha=',alpha)
         return alpha
