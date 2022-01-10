@@ -25,7 +25,7 @@ def plt_common():
     matplotlib.use("pgf")
     # swap pdflatex for tectonic based on your system
     plt.rc("pgf", texsystem="pdflatex", rcfonts=False)
-    plt.rc("font", family="serif")
+    plt.rc("font", family="serif", size=11)
     plt.rc("text", usetex=True)
 
 
@@ -44,10 +44,9 @@ def plot_methods():
     inc = 1
     fig, axs = plt.subplots(
         1+len(methods), len(images),
-        figsize=(5*inc,8*inc)
+        figsize=(5*inc,8*inc), dpi=480
     )
     plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.5, hspace=0)
-    fig.suptitle(f'Immagini corotte e ripristinate con varie tecniche')
 
     original_images = []
     blurred_images = []
