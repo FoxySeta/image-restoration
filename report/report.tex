@@ -28,6 +28,10 @@
 \maketitle
 \thispagestyle{empty}
 
+\pagebreak
+\tableofcontents
+\pagebreak
+
 \epigraph{Lo scopo del calcolo è la conoscenza, non i numeri.}
 {\textit{R. W. Hamming}}
 \epigraph{... ma per lo studente, i numeri sono spesso la via migliore verso la
@@ -35,12 +39,67 @@ conoscenza}
 {\textit{A. Ralston}}
 
 \section{Introduzione}
+La rappresentabilità delle immagini digitali in forma matriciale fa sì che la
+loro manipolazione possa trarre beneficio dagli strumenti del calcolo numerico:
+un problema di interesse pratico è la ricostruzione di tali immagini quando
+degradate. Nell'esperimento che segue, ci proponiamo di effettuare un'analisi
+compararata di esempi di implementazioni dei metodi risolutivi più noti per la
+risoluzione di questo tipo di problemi. Assumeremo, fra le conoscenze pregresse
+della lettrice e del lettore, il modello di formazione-registrazione di
+un'immagine digitale e i principali metodi di regolarizzazione.
 
 \section{Strumenti}
+Tutte le procedure necessarie all'esperimento sono state implementate in Python
+3. In particolare, viene fatto uso dei pacchetti:
+\begin{itemize}
+  \item \verb!matplotlib! per la creazione di grafici;
+  \item \verb!numpy! per l'uso di matrici;
+  \item \verb!scipy! per risolvere i problemi di ottimizzazione;
+  \item \verb!skimage! per il calcolo delle metriche delle immagini.
+\end{itemize}
 
 \section{Procedimento}
 
-\section{Risultati}
+\subsection{Generazione dell'insieme dei dati}
+Sono state preparate otto immagini (da \verb!1.png! a \verb!8.png!): sono tutte
+$512 \times 512$, in scala di grigi e contenenti dai due ai sei oggetti
+geometrici a tinta unita su sfondo nero. Oltre a queste, vengono usate due foto
+reali, sempre in scala di grigio ma di risoluzione $2048 \times 2048$:
+\verb!A.png! e \verb!B.png!.
+
+\subsection{Corruzione dell'insieme dei dati}
+Per ogni immagine $x$ fra quelle sopra indicate, viene dapprima applicata una
+sfocatura di matrice associata $A$ e poi un rumore uniforme di matrice associata
+$\eta$ (entrambi costruiti a partire da una gaussiana) al fine di ottenere
+un'immagine degradata $b$:
+\begin{equation}
+  b = Ax + \eta
+\end{equation}
+Tali operazioni sono ripetute più volte, ciascuna con valori diversi assegnati
+ai parametri in questione (si veda \ref{results}).
+
+\subsection{Risoluzione ingenua}
+Una semplice ricostruzione $x*$ viene implementata a partire da:
+\begin{equation}\label{eq:naive}
+  x* = \arg \min_{x} \frac{1}{2}||Ax - b||^2_2
+\end{equation}
+
+\subsection{Risoluzione usando un termine di regolarizzazione di Tikhonov}
+Introducendo un termine di regolarizzazione di Tikhonov, la \ref{eq:naive}
+diventa:
+\begin{equation}
+  x* = \arg \min_{x} \frac{1}{2}||Ax - b||^2_2 + \frac{\lambda}{2}||x||^2_2
+\end{equation}
+
+\subsection{Risoluzione usando la variazione totale}
+Usando invece la variazione totale come termine di fattorizzazione, la
+\ref{eq:naive} diventa:
+\begin{equation}
+  x* = \arg \min_{x} \frac{1}{2}||Ax - b||^2_2 +
+  \lambda\sum_i^n\sum_j^m\sqrt{||\nabla x(i,j)||_2^2+\epsilon^2}
+\end{equation}
+
+\section{Risultati} \label{results}
 
 \subsection{Confronto}
 

@@ -7,7 +7,7 @@ import os
 import sys
 
 # Default MAXITER
-MAXITER = 50
+MAXITER = 25
 
 # Default TOLERANCE
 TOLERANCE = 10e-3
