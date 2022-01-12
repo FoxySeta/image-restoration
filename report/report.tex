@@ -172,7 +172,7 @@ PSNR stesso.
 \subsection{Esecuzioni}
 Concludiamo confrontando, iterazione per iterazione, le esecuzioni del metodo
 del gradiente e di quello dei gradienti coniugati su \verb!1.png!; il termine di
-regolarizzazione usato è quello di Tikhonov. Si consultino le figure
+regolarizzazione usato è quello della variazione totale. Si consultino le figure
 \ref{fig:iterations-error}, \ref{fig:iterations-objective} e
 \ref{fig:iterations-gradient}. In tutti i casi le funzioni convergono dall'alto
 a un valore basso. Nel caso dello studio del valore della funzione obiettivo e
@@ -189,7 +189,6 @@ iterazione prima del metodo del gradiente.
       \label{fig:iterations-error}
     \end{subfigure}
 \end{figure}
-dio cane trovami
 
 \section{Conclusioni}
 
@@ -211,7 +210,12 @@ il problema sia malcondizionato aggrava questa mancanza. Nel caso della
 ricostruzione con variazione totale, invece, una possibile spiegazione per la
 estrema regolarità osservata potrebbe ipotizzare che la funzione della
 variazione totale imponga derivate parziali piccole nella soluzione ottenuta
-penalizzando quelle grandi in modulo.
+penalizzando quelle grandi in modulo. Per quanto riguarda \verb!A.png! e
+\verb!B.png!, invece, sappiamo per certo di star lavorando con immagini già
+imperfette a priori del nostro processo di degradazione (di cui almeno
+conosciamo la natura): vengono quindi a sommarsi errori provenienti da fonti
+diverse. Queste fotografie non costituiscono un caso di studio semplice,
+ne' adatto ai nostri scopi.
 
 \subsection{Variazione dei parametri}
 Il fatto che il PSNR cresca al diminuire di MSE è confermato dalla definizione
