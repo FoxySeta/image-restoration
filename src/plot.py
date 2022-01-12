@@ -40,13 +40,14 @@ def plot_methods():
     l = 0.04  # Lambda value common for all methods
 
     # Setup the plot layout
-    figS = (6,14)
+    figS = (6, 14)
     inc = 1
     fig, axs = plt.subplots(
-        1+len(methods), len(images),
-        figsize=(5*inc,8*inc), dpi=480
+        1 + len(methods), len(images), figsize=(5 * inc, 8 * inc), dpi=480
     )
-    plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.5, hspace=0)
+    plt.subplots_adjust(
+        left=None, bottom=None, right=None, top=None, wspace=0.5, hspace=0
+    )
 
     original_images = []
     blurred_images = []
@@ -69,13 +70,15 @@ def plot_methods():
             # Deblur each image with the appropriate metho/minimization function
             phi_dphi = (main.methods[method[0]]["phi"], main.methods[method[0]]["dphi"])
             minFun = main.sci_minimize if method[1] == "scipy" else main.our_minimize
-            deblurred = main.phasen(original_images[i], blurred, l, phi_dphi, minFun, main.MAXITER)
+            deblurred = main.phasen(
+                original_images[i], blurred, l, phi_dphi, minFun, main.MAXITER
+            )
             if i == 0:
-                axs[j+1][i].set_ylabel(method[2])
-            axs[j+1][i].imshow(deblurred[0], cmap='gray', vmin=0, vmax=1)
-    
+                axs[j + 1][i].set_ylabel(method[2])
+            axs[j + 1][i].imshow(deblurred[0], cmap="gray", vmin=0, vmax=1)
+
     fig.tight_layout()
-    plt.savefig('report/methods.pgf',bbox_inches='tight')
+    plt.savefig("report/methods.pgf", bbox_inches="tight")
 
 
 """
@@ -236,7 +239,12 @@ def plot_aggregations():
         for i, param in enumerate(params):
             blurred = main.blur(original, param["blur"], param["noise"])
             deblurred = main.phasen(
-                original, blurred, param["lambda"], phi_dphi, main.sci_minimize, main.MAXITER
+                original,
+                blurred,
+                param["lambda"],
+                phi_dphi,
+                main.sci_minimize,
+                main.MAXITER,
             )
             table[i].append((deblurred[1], deblurred[2]))
         print("Done for aggregations of image: " + image)
@@ -267,9 +275,8 @@ def plot_iterations():
     colors = ["blue", "red"]
     measurers = {
         # error measurement
-        "error": lambda original, deblurred, f, df: np.linalg.norm(
-            original - deblurred
-        ) / np.linalg.norm(original),
+        "error": lambda original, deblurred, f, df: np.linalg.norm(original - deblurred)
+        / np.linalg.norm(original),
         # target function measurement
         "objective": lambda original, deblurred, f, df: f(deblurred),
         # gradient norm measurement

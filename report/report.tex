@@ -106,6 +106,10 @@ gradienti coniugati (GC) anziché quello del gradiente (G).
 \subsection{Confronto}
 In figura \ref{fig:comparison} sono riportati i risultati dei diversi metodi di
 ricostruzione su una immagine geometrica e due fotografie.
+Si osserva che la differenza fra diverse versioni di una stessa immagine è molto
+più evidente in \verb!1.png! che negli altri casi: qui, la ricostruzione più
+"rumorosa", nonché di peggior qualità, è visibilmente quella naïve, mentre la
+ricostruzione con variazione totale è quella che offre effetti più regolari.
 \begin{figure}\label{fig:comparison}
    \begin{center}
        \vspace*{-1.1in}
@@ -116,10 +120,6 @@ ricostruzione su una immagine geometrica e due fotografie.
    usato) pari a $0.04$. Gli indici di PSNR e MSE non si riferiscono ad alcuna
    immagine presente, bensì alle degradazioni.}
 \end{figure}
-Si osserva che la differenza fra diverse versioni di una stessa immagine è molto
-più evidente in \verb!1.png! che negli altri casi: qui, la ricostruzione più
-"rumorosa", nonché di peggior qualità, è visibilmente quella naïve, mentre la
-ricostruzione con variazione totale è quella che offre effetti più regolari.
 
 \subsection{Variazione dei parametri}
 Variando i parametri in gioco, è possibile tabulare PSNR e MSE ottenuti con i
@@ -152,6 +152,8 @@ sembra avere un atteggiamento concavo.
 \subsection{Dati aggregati}
 La tabella \ref{fig:aggregation} riassume PSNR e MSE dell'intero insieme di
 immagini geometriche tramite media e deviazione standard.
+Si osserva che la deviazione standard del PSNR si minimizza per valori bassi
+del rumore dell'immagine degradata e del parametro di regolarizzazione usato.
 \begin{figure}\label{fig:aggregation}
     \begin{center}
         \scalebox{0.65}{\input{aggregations.tex}}
@@ -162,25 +164,31 @@ immagini geometriche tramite media e deviazione standard.
     dati. Il metodo usato è quello dei gradienti coniugati, mentre la variazione totale è stata scelta come
     termine di regolarizzazione.}
 \end{figure}
-Si osserva che la deviazione standard del PSNR si minimizza per valori bassi
-del rumore dell'immagine degradata e del parametro di regolarizzazione usato.
 
 \subsection{Esecuzioni}
 Concludiamo confrontando, iterazione per iterazione, le esecuzioni del metodo
 del gradiente e di quello dei gradienti coniugati su \verb!1.png!; il termine di
-regolarizzazione usato è quello di Tikhonov.
-\begin{figure}
+regolarizzazione usato è quello di Tikhonov. Si consultino le figure
+\ref{fig:iterations-error}, \ref{fig:iterations-objective} e
+\ref{fig:iterations-gradient}. In tutti i casi le funzioni convergono dall'alto
+a un valore basso. Nel caso dello studio del valore della funzione obiettivo e
+della norma del suo gradiente, i valori a cui i due metodi convergono
+approssimativamente coincidono. Nel caso dell'MSE e del valore della funzione
+obiettivo, i grafici sono monotoni non crescenti per entrambi i metodi. In tutti
+i casi, il metodo dei gradienti coniugati converge appena qualche iterazione
+prima del metodo del gradiente.
+\begin{figure}\label{fig:iterations-error}
     \begin{center}
         \scalebox{0.65}{\input{iterations-error.pgf}}
     \end{center}
     \caption{MSE dei due metodi a confronto}
-\end{figure}
+\end{figure}\label{fig:iterations-objective}
 \begin{figure}
     \begin{center}
         \scalebox{0.65}{\input{iterations-objective.pgf}}
     \end{center}
     \caption{valori della funzione obiettivo da minimizzare a confronto}
-\end{figure}
+\end{figure}\label{fig:iterations-gradient}
 \begin{figure}
     \begin{center}
         \scalebox{0.65}{\input{iterations-gradient.pgf}}
@@ -188,14 +196,17 @@ regolarizzazione usato è quello di Tikhonov.
     \caption{norme dei gradienti della funzione obiettivo da minimizzare a
     confronto}
 \end{figure}
-In tutti i casi le funzioni convergono dall'alto a un valore basso. Nel caso
-dello studio del valore della funzione obiettivo e della norma del suo
-gradiente, i valori a cui i due metodi convergono approssimativamente
-coincidono. Nel caso dell'MSE e del valore della funzione obiettivo, i grafici
-sono monotoni non crescenti per entrambi i metodi. In tutti i casi, il metodo
-dei gradienti coniugati converge appena qualche iterazione prima del metodo del
-gradiente.
 
 \section{Conclusioni}
 
+\subsection{Confronto}
+
+\subsection{Variazione dei parametri}
+
+\subsection{Dati aggregati}
+
+\subsection{Esecuzioni}
+
+\subsection{Ricerche future}
+  
 \end{document}
