@@ -1,10 +1,11 @@
 \documentclass[a4paper]{article}
 \usepackage[italian]{babel}
 \usepackage{epigraph}
+\usepackage{float}
 \usepackage{hhline}
 % plotting
 \usepackage{pgf}
-\usepackage{xcolor}
+\usepackage{subcaption}
 
 \definecolor{bg}{RGB}{255,249,227}
 
@@ -29,8 +30,11 @@
 \thispagestyle{empty}
 
 \pagebreak
+\setcounter{page}{1}
+\pagenumbering{roman}
 \tableofcontents
 \pagebreak
+\pagenumbering{arabic}
 
 \epigraph{Lo scopo del calcolo è la conoscenza, non i numeri.}
 {\textit{R. W. Hamming}}
@@ -43,7 +47,7 @@ La rappresentabilità delle immagini digitali in forma matriciale fa sì che la
 loro manipolazione possa trarre beneficio dagli strumenti del calcolo numerico:
 un problema di interesse pratico è la ricostruzione di tali immagini quando
 degradate. Nell'esperimento che segue, ci proponiamo di effettuare un'analisi
-compararata di esempi di implementazioni dei metodi più noti per la risoluzione
+comparata di esempi di implementazioni dei metodi più noti per la risoluzione
 di questo tipo di problemi. Assumeremo, fra le conoscenze pregresse della
 lettrice e del lettore, il modello di formazione-registrazione di un'immagine
 digitale e i principali metodi di regolarizzazione.
@@ -61,11 +65,11 @@ Tutte le procedure necessarie all'esperimento sono state implementate in Python
 \section{Procedimento}
 
 \subsection{Generazione dell'insieme dei dati}
-Sono state preparate otto immagini (da \verb!1.png! a \verb!8.png!): sono tutte
-$512 \times 512$, in scala di grigi e contenenti dai due ai sei oggetti
-geometrici a tinta unita su sfondo nero. Oltre a queste, vengono usate due foto
-reali, sempre in scala di grigi ma di risoluzione $2048 \times 2048$:
-\verb!A.png! e \verb!B.png!.
+Sono state preparate otto immagini (da \verb!1.png! a \verb!8.png!) $512 \times
+512$, in scala di grigi e contenenti dai due ai sei oggetti geometrici a tinta
+unita su sfondo nero. Oltre a queste, vengono usate due foto reali, sempre in
+scala di grigi ma di risoluzione $2048 \times 2048$: \verb!A.png! e
+\verb!B.png!.
 
 \subsection{Corruzione dell'insieme dei dati}
 Per ogni immagine $x$ fra quelle sopra indicate, viene dapprima applicata una
@@ -110,18 +114,15 @@ Si osserva che la differenza fra diverse versioni di una stessa immagine è molt
 più evidente in \verb!1.png! che negli altri casi: qui, la ricostruzione più
 "rumorosa", nonché di peggior qualità, è visibilmente quella naïve, mentre la
 ricostruzione con variazione totale è quella che offre effetti più regolari.
-\begin{figure}
+\begin{figure}[H]
   \begin{center}
-    \vspace*{-1.1in}
-    \centerline{\scalebox{1.3}{\input{methods.pgf}}}
+    \scalebox{0.75}{\input{methods.pgf}}
   \end{center}
-  \vspace*{-0.2in}
   \caption{confronto dei risultati con parametro di regolarizzazione (dove
   usato) pari a $0.04$. Gli indici di PSNR e MSE non si riferiscono ad alcuna
   immagine presente, bensì alle degradazioni.}
   \label{fig:comparison}
 \end{figure}
-
 \subsection{Variazione dei parametri}
 Variando i parametri in gioco, è possibile tabulare PSNR e MSE ottenuti con i
 vari metodi: il risultato di questa operazione è mostrato in figura
@@ -134,7 +135,7 @@ metodo naïve vengono addirittura raggiunti valori negativi. All'aumentare
 dell'intensità del rumore, i valori scendono, mentre nel caso del parametro di
 regolarizzazione (fatta eccezione per la prima colonna), l'andamento del PSNR
 sembra avere un atteggiamento concavo.
-\begin{figure}
+\begin{figure}[H]
   \begin{center}
     \scalebox{0.65}{\input{vars-blur.tex}}
   \end{center}
@@ -156,7 +157,7 @@ La tabella \ref{fig:aggregation} riassume PSNR e MSE dell'intero insieme di
 immagini geometriche tramite media e deviazione standard.
 Si osserva che la deviazione standard del PSNR si minimizza per valori bassi del
 PSNR stesso.
-\begin{figure}
+\begin{figure}[H]
   \begin{center}
     \scalebox{0.65}{\input{aggregations.tex}}
   \end{center}
@@ -180,28 +181,15 @@ approssimativamente coincidono. Nel caso dell'errore relativo e del valore della
 funzione obiettivo, i grafici sono monotoni non crescenti per entrambi i metodi.
 In tutti i casi, il metodo dei gradienti coniugati converge appena qualche
 iterazione prima del metodo del gradiente.
-\begin{figure}
-  \begin{center}
-    \scalebox{0.65}{\input{iterations-error.pgf}}
-  \end{center}
-  \caption{errore relativo dei due metodi a confronto}
-  \label{fig:iterations-error}
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{.3\textwidth}
+      \centering
+      \scalebox{.65}{!}{\include{iterations-error.pgf}}
+      \label{fig:iterations-error}
+    \end{subfigure}
 \end{figure}
-\begin{figure}
-  \begin{center}
-    \scalebox{0.65}{\input{iterations-objective.pgf}}
-  \end{center}
-  \caption{valori della funzione obiettivo da minimizzare a confronto}
-  \label{fig:iterations-objective}
-\end{figure}
-\begin{figure}
-  \begin{center}
-    \scalebox{0.65}{\input{iterations-gradient.pgf}}
-  \end{center}
-  \caption{norme dei gradienti della funzione obiettivo da minimizzare a
-  confronto}
-  \label{fig:iterations-gradient}
-\end{figure}
+dio cane trovami
 
 \section{Conclusioni}
 
