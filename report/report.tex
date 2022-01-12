@@ -100,23 +100,40 @@ Usando invece la variazione totale come termine di fattorizzazione, la
 \end{equation}
 
 \section{Risultati} \label{results}
+Dove non specificato, nei risultati che seguono viene usato il metodo dei
+gradienti coniugati (GC) anziché quello del gradiente (G). 
 
 \subsection{Confronto}
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut eget elit dolor. Aenean sodales mi a aliquet accumsan. Mauris molestie ultrices velit quis accumsan. Maecenas tortor neque, commodo et sagittis sed, consectetur vel diam. Maecenas venenatis sem magna, sollicitudin placerat purus laoreet a. Nullam convallis felis vitae ligula ultrices, in vestibulum augue auctor. Suspendisse risus purus, euismod ac ultricies eget, blandit et ex. Fusce nunc dui, feugiat ut velit at, dignissim consectetur sem. Quisque aliquet suscipit consequat. Sed in libero lectus. Proin tempor malesuada ultricies. Morbi lobortis rhoncus lorem et dignissim. Ut elementum diam at leo efficitur tempus. Curabitur vitae nibh auctor, ultricies mauris vel, faucibus neque. Quisque tincidunt orci condimentum molestie hendrerit. Donec et mattis nisi.
-\begin{figure}
+In figura \ref{fig:comparison} sono riportati i risultati dei diversi metodi di
+ricostruzione su una immagine geometrica e due fotografie.
+\begin{figure}\label{fig:comparison}
    \begin{center}
        \vspace*{-1.1in}
        \centerline{\scalebox{1.3}{\input{methods.pgf}}}
    \end{center}
    \vspace*{-0.2in}
-   \caption{bla bla bla}
+   \caption{confronto dei risultati con parametro di regolarizzazione (dove
+   usato) pari a $0.04$. Gli indici di PSNR e MSE non si riferiscono ad alcuna
+   immagine presente, bensì alle degradazioni.}
 \end{figure}
-Phasellus sit amet libero eu eros convallis blandit ac a mauris. Ut volutpat purus sed mi ullamcorper, sit amet porttitor nibh finibus. Aenean sed orci consequat, iaculis est a, auctor lectus. Maecenas ut volutpat eros. Curabitur volutpat felis sit amet lorem porta cursus. Duis lobortis sagittis elit. Mauris nec vulputate dolor, non dignissim tellus. Nam ultrices quam ac mauris cursus malesuada.
+Si osserva che la differenza fra diverse versioni di una stessa immagine è molto
+più evidente in \verb!1.png! che negli altri casi: qui, la ricostruzione più
+"rumorosa", nonché di peggior qualità, è visibilmente quella naïve, mentre la
+ricostruzione con variazione totale è quella che offre effetti più regolari.
 
 \subsection{Variazione dei parametri}
-
-\begin{figure}
+Variando i parametri in gioco, è possibile tabulare PSNR e MSE ottenuti con i
+vari metodi: il risultato di questa operazione è mostrato in figura
+\ref{fig:parameters}.
+Confrontando celle diverse, ci si accorge che a valori del PSNR più alti
+corrispondono sempre valori dell'MSE più bassi e viceversa: ci limitamo quindi
+all'osservazione del primo di questi due parametri. A parità di parametri, esso
+cresce all'aumentare dell'indice della colonna: in alcune applicazioni del
+metodo naïve vengono addirittura raggiunti valori negativi. All'aumentare
+dell'intensità del rumore, i valori scendono, mentre nel caso del parametro di
+regolarizzazione (fatta eccezione per la prima colonna), l'andamento del PSNR
+sembra avere un atteggiamento concavo.
+\begin{figure}\label{fig:parameters}
     \begin{center}
         \scalebox{0.65}{\input{vars-blur.tex}}
     \end{center}
@@ -126,41 +143,58 @@ Phasellus sit amet libero eu eros convallis blandit ac a mauris. Ut volutpat pur
     \begin{center}
       \scalebox{0.65}{\input{vars-lambda.tex}}
     \end{center}
-  \caption{bla bla bla}
+  \caption{antologia di tabelle che confrontano le coppie ordinate (PSNR, MSE)
+  di varie ricostruzioni della prima immagine di prova al variare della
+  sfocatura, dell'intensità del rumore e del parametro di regolarizzazione
+  usato.}
 \end{figure}
 
 \subsection{Dati aggregati}
-
-\begin{figure}
+La tabella \ref{fig:aggregation} riassume PSNR e MSE dell'intero insieme di
+immagini geometriche tramite media e deviazione standard.
+\begin{figure}\label{fig:aggregation}
     \begin{center}
         \scalebox{0.65}{\input{aggregations.tex}}
     \end{center}
-    \caption{dati aggregati}
+    \caption{medie e deviazioni standard delle coppie ordinate (PSNR, MSE) al
+    variare dei parametri. Il campione preso in esame è composto dalle
+    ricostruzioni effettuate su ciascuna immagine geomatrica dell'insieme di
+    dati. Il metodo usato è quello dei gradienti coniugati, mentre la variazione totale è stata scelta come
+    termine di regolarizzazione.}
 \end{figure}
+Si osserva che la deviazione standard del PSNR si minimizza per valori bassi
+del rumore dell'immagine degradata e del parametro di regolarizzazione usato.
 
 \subsection{Esecuzioni}
-
-Nullam tempor eget sapien eget suscipit. Fusce bibendum leo odio, eget tempus erat volutpat ac. Vestibulum non elit mauris. Mauris ut aliquam lectus, sed tincidunt diam. Aenean vehicula velit id nisl rutrum, ac fermentum magna accumsan. Nulla eget est viverra, maximus lorem vel, mattis est. Nam id sapien leo.
+Concludiamo confrontando, iterazione per iterazione, le esecuzioni del metodo
+del gradiente e di quello dei gradienti coniugati su \verb!1.png!; il termine di
+regolarizzazione usato è quello di Tikhonov.
 \begin{figure}
     \begin{center}
         \scalebox{0.65}{\input{iterations-error.pgf}}
     \end{center}
-    \caption{error}
+    \caption{MSE dei due metodi a confronto}
 \end{figure}
-Etiam sit amet urna eu quam auctor facilisis et tristique nisl. Quisque varius turpis tincidunt, rhoncus tellus sed, bibendum velit. Suspendisse pellentesque venenatis sapien, ac blandit sem congue et. Ut accumsan scelerisque sapien, sit amet consequat nisl efficitur vitae. Nulla sed sem elit. Aenean vestibulum nisl in lacus pharetra, nec sollicitudin arcu tincidunt. Sed in aliquet mauris, facilisis viverra tellus. Nam ultrices ultrices magna, et rhoncus massa tempor sit amet. Mauris efficitur nunc sit amet quam molestie, quis aliquam ex mollis. Ut in sem rutrum, tempus eros et, volutpat libero. Praesent eget tincidunt sem. Suspendisse vitae nunc pellentesque, dapibus augue eu, tempus lacus. Praesent quis lectus purus. Nullam quis nulla odio. Quisque at felis in nulla placerat facilisis.
 \begin{figure}
     \begin{center}
         \scalebox{0.65}{\input{iterations-objective.pgf}}
     \end{center}
-    \caption{objective}
+    \caption{valori della funzione obiettivo da minimizzare a confronto}
 \end{figure}
-In sapien turpis, ullamcorper tincidunt enim finibus, bibendum tempor quam. Suspendisse commodo ex ac massa aliquet, ac blandit erat rhoncus. Nulla porta massa quis egestas pretium. Sed aliquam magna augue, et fermentum sapien facilisis quis. Duis leo ex, pretium sed feugiat ac, viverra id elit. Ut cursus bibendum rutrum. Praesent tempor mattis ex, vel tempor mi pharetra in.
 \begin{figure}
     \begin{center}
         \scalebox{0.65}{\input{iterations-gradient.pgf}}
     \end{center}
-    \caption{gradient}
+    \caption{norme dei gradienti della funzione obiettivo da minimizzare a
+    confronto}
 \end{figure}
+In tutti i casi le funzioni convergono dall'alto a un valore basso. Nel caso
+dello studio del valore della funzione obiettivo e della norma del suo
+gradiente, i valori a cui i due metodi convergono approssimativamente
+coincidono. Nel caso dell'MSE e del valore della funzione obiettivo, i grafici
+sono monotoni non crescenti per entrambi i metodi. In tutti i casi, il metodo
+dei gradienti coniugati converge appena qualche iterazione prima del metodo del
+gradiente.
 
 \section{Conclusioni}
 

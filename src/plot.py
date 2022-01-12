@@ -10,10 +10,10 @@ decimal_places = 3
 # List of methods to plot. The structur for each tuple is:
 #   (method internal name, minimize function, method display name)
 methods = (
-    ("naive", "scipy", "Naive"),
-    ("tikhonov", "scipy", "Tikhonov"),
-    ("tikhonov", "our", "Tikhonov (nostro minimize)"),
-    ("tv", "scipy", "Variazione Totale"),
+    ("naive", "scipy", "Naïve"),
+    ("tikhonov", "scipy", "Tikhonov (GC)"),
+    ("tikhonov", "our", "Tikhonov (G)"),
+    ("tv", "scipy", "Variazione totale"),
 )
 
 """
@@ -141,7 +141,7 @@ def plot_vars():
 
         f = open("report/vars-" + params["iterate_over"] + ".tex", "w+")
         x_labels = tuple(map(params["label"], rows))
-        y_labels = ("naive", "tykhonov (sci)", "tykhonov (our)", "tv")
+        y_labels = ("Naïve", "Tikhonov (GC)", "Tikhonov (G)", "Variazione totale")
         f.write(plot_table(table, x_labels, y_labels))
         f.close()
 
