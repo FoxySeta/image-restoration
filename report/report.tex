@@ -5,9 +5,6 @@
 \usepackage{hhline}
 % plotting
 \usepackage{pgf}
-\usepackage{subcaption}
-
-\definecolor{bg}{RGB}{255,249,227}
 
 \title{
   Ricostruzione di immagini \\ \large Relazione del progetto per
@@ -182,14 +179,30 @@ funzione obiettivo, i grafici sono monotoni non crescenti per entrambi i metodi.
 In tutti i casi, il metodo dei gradienti coniugati converge appena qualche
 iterazione prima del metodo del gradiente.
 \begin{figure}[H]
+  \centering
+  \begin{minipage}[t]{0.48\linewidth}
     \centering
-    \begin{subfigure}{.3\textwidth}
-      \centering
-      \scalebox{.65}{!}{\include{iterations-error.pgf}}
-      \label{fig:iterations-error}
-    \end{subfigure}
+    \scalebox{0.4}{\input{iterations-error.pgf}}
+    \label{fig:iterations-error}
+    \caption{errore relativo dei due metodi a confronto}
+  \end{minipage}
+  \,\,
+  \begin{minipage}[t]{0.48\linewidth}
+    \centering
+    \scalebox{0.4}{\input{iterations-objective.pgf}}
+    \label{fig:iterations-objective}
+    \caption{valori della funzione obiettivo da minimizzare a confronto}
+  \end{minipage}
 \end{figure}
-dio cane trovami
+\begin{figure}[H]
+  \centering
+  \begin{minipage}[t]{0.48\linewidth}
+  \scalebox{0.4}{\input{iterations-objective.pgf}}
+  \label{fig:iterations-gradient}
+  \caption{norme dei gradienti della funzione obiettivo da minimizzare a
+    confronto}
+  \end{minipage}
+\end{figure}
 
 \section{Conclusioni}
 
