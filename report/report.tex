@@ -1,4 +1,5 @@
 \documentclass[a4paper]{article}
+\usepackage{amsmath}
 \usepackage[italian]{babel}
 \usepackage{epigraph}
 \usepackage{float}
@@ -79,14 +80,14 @@ un'immagine degradata $b$:
 Tali operazioni sono ripetute più volte, ciascuna con valori diversi assegnati
 ai parametri in questione (si veda \ref{results}).
 
-\subsection{Risoluzione ingenua}
+\subsection{Risoluzione naïve}
 Una semplice ricostruzione $x^*$ viene implementata a partire da:
 \begin{equation}\label{eq:naive}
   x^* = \arg \min_{x} \frac{1}{2}||Ax - b||^2_2
 \end{equation}
 
 \subsection{Risoluzione usando un termine di regolarizzazione di Tikhonov}
-Introducendo un termine di regolarizzazione di Tikhonov, la \ref{eq:naive}
+Introducendo un termine di regolarizzazione di Tikhonov, la \eqref{eq:naive}
 diventa:
 \begin{equation}
   x^* = \arg \min_{x} \frac{1}{2}||Ax - b||^2_2 + \frac{\lambda}{2}||x||^2_2
@@ -94,7 +95,7 @@ diventa:
 
 \subsection{Risoluzione usando la variazione totale}
 Usando invece la variazione totale come termine di fattorizzazione, la
-\ref{eq:naive} diventa:
+\eqref{eq:naive} diventa:
 \begin{equation}
   x^* = \arg \min_{x} \frac{1}{2}||Ax - b||^2_2 +
   \lambda\sum_i^n\sum_j^m\sqrt{||\nabla x(i,j)||_2^2+\epsilon^2}
@@ -213,12 +214,12 @@ colore, che permette più facilmente di individuare rumore, e bordi
 geometricamente regolari, lungo i quali eventuali imperfezioni risultano più
 visibili. L'uso di semplici immagini geometriche a tinta unita si rivela quindi
 essere strategico per l'indagine in questione. Nella fattispecie, il rumore
-della sua ricostruzione naïve è spiegabile tenendo conto che \ref{eq:naive} è la
-riformulazione ai minimi quadrati di
+della sua ricostruzione naïve è spiegabile tenendo conto che \eqref{eq:naive} è
+la riformulazione ai minimi quadrati di
 \begin{equation}
   Ax = b
 \end{equation}
-la quale, a differenza di \ref{eq:degradation}, non tiene conto del rumore
+la quale, a differenza di \eqref{eq:degradation}, non tiene conto del rumore
 $\eta$, e soffre quindi di una incertezza detta "rumore inverso". Il fatto che
 il problema sia malcondizionato aggrava questa mancanza. Nel caso della
 ricostruzione con variazione totale, invece, una possibile spiegazione per la
@@ -249,7 +250,7 @@ Imponiamo:
 \begin{equation}
   PSNR < 0
 \end{equation}
-Facendo uso di \ref{eq:psnr}, arriviamo a:
+Facendo uso di \eqref{eq:psnr}, arriviamo a:
 \begin{equation}
   \max{x^2} < MSE
 \end{equation}
@@ -257,13 +258,13 @@ o anche
 \begin{equation}
   \forall x_{i,j} \in x \quad x_{i,j}^2 < MSE
 \end{equation}
-Questa relazione potrebbe venir letta come "nel caso di PSNR negativo, in tutti
+Questa relazione potrebbe venir letta come ``nel caso di PSNR negativo, in tutti
 i punti dell'immagine, l'errore quadratico medio sovrasta perfino il valore
-quadratico dell'immagine originale". Cerchiamo ora di dare una spiegazione alla
+quadratico dell'immagine originale''. Cerchiamo ora di dare una spiegazione alla
 relazione fra alcuni parametri e il risultato. Avere ottenuto ricostruzioni di
 peggior qualità quando il rumore si faceva più intenso era prevedibile: nel caso
 generale, aumentare l'incertezza sui dati porta a soluzioni anch'esse meno
-accurate in una qualche misura, e nella nostro particolare situazione stiamo
+accurate in una qualche misura, e nella nostra particolare situazione stiamo
 lavorando con problemi tipicamente mal condizionati. Il carattere concavo del
 PSNR al variare del parametro di regolarizzazione (dove questo viene
 effettivamente usato), invece, suggerisce l'esistenza di un valore intermedio
