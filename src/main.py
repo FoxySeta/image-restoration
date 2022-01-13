@@ -12,13 +12,10 @@ MAXITER = 25
 # Default TOLERANCE
 TOLERANCE = 10e-3
 
-# Our norm of order 2
-our_norm = lambda X : np.linalg.norm(X, 2)
-
 # Methods Dictionary
 methods = {
     "naive": {"phi": lambda _: 0, "dphi": lambda _: 0},
-    "tikhonov": {"phi": lambda X: 0.5 * our_norm(X) ** 2, "dphi": lambda X: X},
+    "tikhonov": {"phi": lambda X: 0.5 * np.linalg.norm(X) ** 2, "dphi": lambda X: X},
     "tv": {"phi": lib.totvar, "dphi": lib.grad_totvar},
 }
 
@@ -32,7 +29,7 @@ def minimize(x0, f, df, maxiter, abs_stop) -> np.ndarray:
     k = 0
 
     # Stopping criteria
-    while our_norm(df(x_last)) > abs_stop and k < maxiter:
+    while np.linalg.norm(df(x_last)) > abs_stop and k < maxiter:
         # The direction is given by the gradient of the last iteration
         grad = df(x_last)
 
@@ -122,7 +119,7 @@ def f_generator(l, regulating_term, regulating_term_grad):
         def f(x):
             X = x.reshape(b.shape)
             #    |        same for every method        |     |   user choise  |
-            res = 0.5 * (our_norm(lib.A(X, K) - b) ** 2) + l * regulating_term(X)
+            res = 0.5 * (np.linalg.norm(lib.A(X, K) - b) ** 2) + l * regulating_term(X)
             return np.sum(res)
 
         def df(x):
