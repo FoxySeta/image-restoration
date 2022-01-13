@@ -12,6 +12,7 @@ MAXITER = 25
 # Default TOLERANCE
 TOLERANCE = 10e-3
 
+# Our norm of order 2
 our_norm = lambda X : np.linalg.norm(X, 2)
 
 # Methods Dictionary
