@@ -7,7 +7,7 @@ import os
 import sys
 
 # Default MAXITER
-MAXITER = 50
+MAXITER = 25
 
 # Default TOLERANCE
 TOLERANCE = 10e-3
@@ -97,7 +97,9 @@ def phasen_multi(true_image, lambdas, blurred_images, method="naive", minFun="sc
 
     for l in lambdas:
         for blurred in blurred_images:
-            deblurred.append(phasen(true_image, blurred, l, phi_dphi, minimizeFun, MAXITER))
+            deblurred.append(
+                phasen(true_image, blurred, l, phi_dphi, minimizeFun, MAXITER)
+            )
     return deblurred
 
 
