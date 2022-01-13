@@ -7,6 +7,10 @@ from skimage import metrics
 
 # Number of decimal places to round for plotting
 decimal_places = 3
+
+# Our norm of order 2
+our_norm = lambda X : np.linalg.norm(X, 2)
+
 # List of methods to plot. The structur for each tuple is:
 #   (method internal name, minimize function, method display name)
 methods = (
@@ -275,12 +279,12 @@ def plot_iterations():
     colors = ["blue", "red"]
     measurers = {
         # error measurement
-        "error": lambda original, deblurred, f, df: np.linalg.norm(original - deblurred)
-        / np.linalg.norm(original),
+        "error": lambda original, deblurred, f, df: our_norm(original - deblurred)
+        / our_norm(original),
         # target function measurement
         "objective": lambda original, deblurred, f, df: f(deblurred),
         # gradient norm measurement
-        "gradient": lambda original, deblurred, f, df: np.linalg.norm(df(deblurred)),
+        "gradient": lambda original, deblurred, f, df: our_norm(df(deblurred)),
     }
     for i, (solver_name, solver) in enumerate(solvers.items()):
         x = np.linspace(1, main.MAXITER, main.MAXITER)
